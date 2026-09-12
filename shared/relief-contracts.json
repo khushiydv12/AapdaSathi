@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AapdaSathi Member 3 Relief Intelligence API Contracts",
+  "description": "Standard REST interfaces and payloads exchanged between Member 3 (Relief Engine) and Member 4 (Central Backend & MongoDB)",
+  "version": "1.0.0",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/relief/inventory",
+      "description": "Returns current live relief inventory across all NER depots and relief camps",
+      "responseSchema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item_id": { "type": "string" },
+            "item_name": { "type": "string" },
+            "category": { "type": "string", "enum": ["Food", "Drinking Water", "Medicines", "Blankets & Clothes", "Sanitary & Hygiene", "Emergency Equipment"] },
+            "quantity": { "type": "number" },
+            "unit": { "type": "string" },
+            "location": { "type": "string" },
+            "state": { "type": "string" },
+            "source": { "type": "string", "enum": ["Government Warehouse", "Relief Centre", "NGO", "Volunteer", "Donor", "Relief Camp"] },
+            "expiry_date": { "type": "string", "format": "date" }
+          },
+          "required": ["item_id", "item_name", "category", "quantity", "unit", "location", "state", "source"]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/relief/requests",
+      "description": "Citizen / community submits a relief assistance request",
+      "requestSchema": {
+        "type": "object",
+        "properties": {
+          "location": { "type": "string" },
+          "state": { "type": "string" },
+          "district": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "people_count": { "type": "integer" },
+          "required_item": { "type": "string" },
+          "quantity": { "type": "number" },
+          "urgency": { "type": "string", "enum": ["LOW", "MODERATE", "HIGH", "CRITICAL"] },
+          "vulnerable_demographics": {
+            "type": "object",
+            "properties": {
+              "children": { "type": "integer" },
+              "elderly": { "type": "integer" },
+              "pregnant": { "type": "integer" },
+              "injured": { "type": "integer" }
+            }
+          },
+          "road_blocked": { "type": "boolean" },
+          "notes": { "type": "string" }
+        },
+        "required": ["location", "state", "district", "people_count", "required_item", "quantity", "urgency"]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/relief/match",
+      "description": "Matches community demand to the nearest available depot with stock",
+      "requestSchema": {
+        "type": "object",
+        "properties": {
+          "request_id": { "type": "string" },
+          "requested_item": { "type": "string" },
+          "required_quantity": { "type": "number" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" }
+        },
+        "required": ["requested_item", "required_quantity", "latitude", "longitude"]
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/relief/distribution/:id/status",
+      "description": "Updates 5-stage delivery lifecycle status",
+      "requestSchema": {
+        "type": "object",
+        "properties": {
+          "delivery_status": {
+            "type": "string",
+            "enum": ["Requested", "Verified", "Assigned", "In Transit", "Delivered", "Rejected"]
+          },
+          "transporter": { "type": "string" },
+          "vehicle_number": { "type": "string" },
+          "notes": { "type": "string" }
+        },
+        "required": ["delivery_status"]
+      }
+    }
+  ]
+}

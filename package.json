@@ -1,0 +1,20 @@
+{
+  "name": "aapdasathi-ner",
+  "version": "1.0.0",
+  "description": "AapdaSathi - AI-Powered Disaster Early Warning, Response & Relief Distribution System for North Eastern India",
+  "scripts": {
+    "dev:relief": "npm --prefix frontend/relief run dev",
+    "build:relief": "npm --prefix frontend/relief run build",
+    "ai:relief": "python ai/relief-demand/api_server.py",
+    "test:ai": "python ai/relief-demand/test_relief_engine.py"
+  },
+  "keywords": [
+    "disaster-management",
+    "relief-intelligence",
+    "sachet",
+    "north-east-india",
+    "ai"
+  ],
+  "author": "AapdaSathi Team - Member 3 (Relief Intelligence)",
+  "license": "ISC"
+}

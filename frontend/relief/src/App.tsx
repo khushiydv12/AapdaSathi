@@ -33,6 +33,7 @@ import {
   INITIAL_HEATMAP_DISTRICTS 
 } from './services/mockData';
 import { computeEssentialCoverageScore } from './services/reliefEngine';
+import { getHealth, getInventory, BackendInventoryItem } from './services/api';
 
 import { Navbar } from './components/Navbar';
 import { CoverageScoreCard } from './components/CoverageScoreCard';
@@ -57,6 +58,99 @@ export function App() {
 
   // Filter for requests list
   const [requestStatusFilter, setRequestStatusFilter] = useState<string>('ALL');
+
+  // Backend connection status
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'connected' | 'offline'>('checking');
+
+  // Convert backend inventory data into the exact InventoryItem shape
+  // expected by Member 3's existing relief UI.
+  const convertBackendInventory = (backendItems: BackendInventoryItem[]): InventoryItem[] => {
+    const getCategory = (value: string): InventoryItem['category'] => {
+      switch (value.toLowerCase()) {
+        case 'food':
+          return 'Food';
+        case 'water':
+        case 'drinking water':
+          return 'Drinking Water';
+        case 'medicine':
+        case 'medicines':
+          return 'Medicines';
+        case 'shelter':
+        case 'blankets':
+        case 'blankets & clothes':
+          return 'Blankets & Clothes';
+        case 'sanitation':
+        case 'sanitary & hygiene':
+          return 'Sanitary & Hygiene';
+        case 'emergency equipment':
+          return 'Emergency Equipment';
+        default:
+          return 'Emergency Equipment';
+      }
+    };
+
+    const getSource = (value: string): InventoryItem['source'] => {
+      const source = value.toLowerCase();
+
+      if (source.includes('government')) return 'Government Warehouse';
+      if (source.includes('relief centre') || source.includes('relief center')) return 'Relief Centre';
+      if (source.includes('ngo')) return 'NGO';
+      if (source.includes('volunteer')) return 'Volunteer';
+      if (source.includes('donor')) return 'Donor';
+      if (source.includes('camp')) return 'Relief Camp';
+
+      return 'Relief Centre';
+    };
+
+    return backendItems.map((item) => ({
+      item_id: item.id,
+      item_name: item.item,
+      category: getCategory(item.category),
+      quantity: item.quantity,
+      unit: item.unit,
+      location: 'North East India',
+      state: 'Assam',
+      source: getSource(item.source),
+      latitude: 26.2006,
+      longitude: 92.9376,
+      contact_person: 'AapdaSathi Relief Team',
+      contact_phone: '+91 00000 00000',
+    }));
+  };
+
+  // Load inventory from the central Node.js backend.
+  // If the backend is unavailable, keep Member 3's original mock data.
+  useEffect(() => {
+    let mounted = true;
+
+    const loadBackendData = async () => {
+      try {
+        const health = await getHealth();
+
+        if (!mounted) return;
+        setBackendStatus(health.status === 'healthy' ? 'connected' : 'offline');
+
+        const inventoryResponse = await getInventory();
+
+        if (!mounted) return;
+
+        if (inventoryResponse.success && inventoryResponse.data.length > 0) {
+          setInventory(convertBackendInventory(inventoryResponse.data));
+        }
+      } catch (error) {
+        console.warn('AapdaSathi backend unavailable. Using local relief data.', error);
+        if (mounted) {
+          setBackendStatus('offline');
+        }
+      }
+    };
+
+    loadBackendData();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Automatically scroll to the very top whenever the user switches modules
   useEffect(() => {
@@ -453,7 +547,19 @@ export function App() {
 
       {/* Clean Light Footer */}
       <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500 font-medium">
-        AapdaSathi Disaster Management System • Relief Intelligence & Resource Coordination
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <span>AapdaSathi Disaster Management System • Relief Intelligence & Resource Coordination</span>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border ${
+            backendStatus === 'connected'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              : backendStatus === 'checking'
+              ? 'bg-amber-50 text-amber-700 border-amber-200'
+              : 'bg-rose-50 text-rose-700 border-rose-200'
+          }`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+            Backend: {backendStatus === 'connected' ? 'Connected' : backendStatus === 'checking' ? 'Checking' : 'Offline / Demo'}
+          </span>
+        </div>
       </footer>
     </div>
   );

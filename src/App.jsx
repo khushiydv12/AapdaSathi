@@ -1,12 +1,14 @@
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Link,
+  Navigate,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 
-import { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -19,74 +21,95 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 
+// ============================================================
+// LEAFLET MARKER ICONS
+// ============================================================
 
-/* ================= LOGIN ================= */
+const userIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/64/64113.png",
+  iconSize: [35, 35],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
+});
+
+const shelterIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/619/619153.png",
+  iconSize: [38, 38],
+  iconAnchor: [19, 38],
+  popupAnchor: [0, -38],
+});
+
+// ============================================================
+// LOGIN PAGE - PAGE 1
+// ============================================================
 
 function Login() {
   const navigate = useNavigate();
   const [mobile, setMobile] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = () => {
-    if (mobile.length === 10) {
-      navigate("/");
-    } else {
-      alert("Please enter a valid 10-digit mobile number.");
+    const cleanMobile = mobile.replace(/\D/g, "");
+
+    if (cleanMobile.length !== 10) {
+      setError("Please enter a valid 10-digit mobile number.");
+      return;
     }
+
+    setError("");
+
+    // Store login information
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userMobile", cleanMobile);
+
+    // Go to Page 2
+    navigate("/", { replace: true });
   };
 
   return (
-    <div className="creative-login">
+    <div className="login-page">
+      {/* Background disaster panels */}
+      <div className="login-background">
+        <div className="disaster-panel rainfall-panel">
+          <span className="disaster-panel-icon">🌧️</span>
+          <h2>Heavy Rainfall</h2>
+          <p>Stay alert during extreme weather</p>
+          <div className="rain-lines">⋮ ⋮ ⋮ ⋮ ⋮</div>
+        </div>
 
-      {/* DISASTER BACKGROUND */}
+        <div className="disaster-panel earthquake-panel">
+          <span className="disaster-panel-icon">🌍</span>
+          <h2>Earthquake</h2>
+          <p>Drop, cover and hold</p>
+          <div className="wave-lines">〰〰〰</div>
+        </div>
 
-      <div className="disaster-scene rainfall">
-        <div className="disaster-icon">🌧️</div>
-        <h2>Heavy Rainfall</h2>
-        <p>Stay alert during extreme weather</p>
-        <div className="rain-drops">⋮ ⋮ ⋮ ⋮ ⋮</div>
+        <div className="disaster-panel flood-panel">
+          <span className="disaster-panel-icon">🌊</span>
+          <h2>Flood</h2>
+          <p>Avoid flooded roads and low areas</p>
+          <div className="wave-lines">〰〰〰〰</div>
+        </div>
+
+        <div className="disaster-panel landslide-panel">
+          <span className="disaster-panel-icon">⛰️</span>
+          <h2>Landslide</h2>
+          <p>Stay away from unstable slopes</p>
+          <div className="landslide-dots">● ● ●</div>
+        </div>
       </div>
-
-
-      <div className="disaster-scene flood">
-        <div className="disaster-icon">🌊</div>
-        <h2>Flood</h2>
-        <p>Avoid flooded roads and low areas</p>
-        <div className="wave">〰〰〰〰</div>
-      </div>
-
-
-      <div className="disaster-scene earthquake">
-        <div className="disaster-icon">🌍</div>
-        <h2>Earthquake</h2>
-        <p>Drop, cover and hold</p>
-        <div className="shake-line">〰〰〰</div>
-      </div>
-
-
-      <div className="disaster-scene landslide">
-        <div className="disaster-icon">⛰️</div>
-        <h2>Landslide</h2>
-        <p>Stay away from unstable slopes</p>
-        <div className="rocks">● ● ●</div>
-      </div>
-
-
-      {/* DARK OVERLAY */}
 
       <div className="login-overlay"></div>
 
-
-      {/* CENTER LOGIN CARD */}
-
+      {/* Login Card */}
       <div className="login-card">
-
         <div className="login-logo">
           🛡️
         </div>
 
         <h1>SafeGuard</h1>
 
-        <p className="login-tagline">
+        <p className="login-subtitle">
           Your personal disaster safety companion
         </p>
 
@@ -98,1644 +121,1525 @@ function Login() {
           Stay informed. Stay prepared. Stay safe.
         </p>
 
-
-        {/* MOBILE NUMBER */}
-
-        <label>Mobile Number</label>
-
-        <div className="mobile-input">
-
-          <span>+91</span>
-
-          <input
-            type="tel"
-            placeholder="Enter mobile number"
-            maxLength="10"
-            value={mobile}
-            onChange={(e) =>
-              setMobile(
-                e.target.value.replace(/\D/g, "")
-              )
-            }
-          />
-
-        </div>
-
-
-        <button
-          className="login-button"
-          onClick={handleLogin}
+        <form
+          className="login-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleLogin();
+          }}
         >
-          Continue →
-        </button>
+          <label htmlFor="mobile">Mobile Number</label>
 
+          <div className="mobile-input-wrapper">
+            <span className="country-code">+91</span>
 
-        <p className="login-safety">
+            <input
+              id="mobile"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              maxLength={10}
+              value={mobile}
+              placeholder="Enter mobile number"
+              onChange={(event) => {
+                const value = event.target.value.replace(/\D/g, "");
+                setMobile(value);
+                setError("");
+              }}
+            />
+          </div>
+
+          {error && <p className="form-error">{error}</p>}
+
+          <button
+            type="submit"
+            className="continue-button"
+          >
+            Continue →
+          </button>
+        </form>
+
+        <p className="login-security">
           🔒 Your information is kept secure
         </p>
-
       </div>
-
     </div>
   );
 }
 
-/* ================= HOME ================= */
+// ============================================================
+// HOME PAGE - PAGE 2
+// ============================================================
 
 function Home() {
   return (
-    <div className="app">
-
-      {/* HEADER */}
-
-      <div className="header">
-
+    <div className="app-page home-page">
+      <header className="home-header">
         <div>
-          <p className="small-text">
-            Welcome back
-          </p>
-
+          <p className="welcome-text">Welcome back</p>
           <h1>SafeGuard</h1>
         </div>
 
-        <Link
-          to="/profile"
-          className="profile-icon"
-        >
+        <Link to="/profile" className="profile-button">
           👤
         </Link>
+      </header>
 
-      </div>
-
-
-      {/* SAFETY STATUS */}
-
-      <div className="safety-card">
-
-        <div className="shield">
-          🛡️
-        </div>
+      {/* Safety Status */}
+      <section className="safety-card safe">
+        <div className="safety-icon">🛡️</div>
 
         <div>
           <h2>You are safe</h2>
-
-          <p className="green-text">
-            No critical alerts nearby
-          </p>
+          <p>No critical alerts nearby</p>
         </div>
+      </section>
 
-      </div>
+      {/* Active Alert */}
+      <section className="active-alert-card">
+        <div className="alert-header">
+          <div className="alert-icon">🌧️</div>
 
-
-      {/* ACTIVE ALERT */}
-
-      <div className="home-alert">
-
-        <div className="home-alert-icon">
-          🌧️
-        </div>
-
-        <div className="home-alert-content">
-
-          <div className="home-alert-title">
-            <strong>Heavy Rainfall</strong>
-
-            <span>HIGH</span>
+          <div className="alert-title">
+            <h3>Heavy Rainfall</h3>
           </div>
 
-          <p>
-            Heavy rainfall expected nearby.
-            Avoid low-lying areas.
-          </p>
+          <span className="severity high">HIGH</span>
+        </div>
 
-          <Link to="/alerts">
-            View Alert →
+        <p>
+          Heavy rainfall expected nearby. Avoid low-lying areas.
+        </p>
+
+        <Link to="/alerts" className="view-alert">
+          View Alert →
+        </Link>
+      </section>
+
+      {/* Quick Actions */}
+      <section className="quick-actions">
+        <h2>Quick Actions</h2>
+
+        <div className="quick-action-grid">
+          <Link to="/alerts" className="quick-action">
+            <span>🚨</span>
+            <p>Alerts</p>
           </Link>
 
+          <Link to="/shelters" className="quick-action">
+            <span>🏠</span>
+            <p>Shelters</p>
+          </Link>
+
+          <Link to="/map" className="quick-action">
+            <span>🗺️</span>
+            <p>Safe Map</p>
+          </Link>
+
+          <Link to="/sos" className="quick-action sos-action">
+            <span>🆘</span>
+            <p>SOS</p>
+          </Link>
         </div>
-
-      </div>
-
-
-      {/* QUICK ACTIONS */}
-
-      <h2 className="section-title">
-        Quick Actions
-      </h2>
-
-      <div className="actions">
-
-        <Link
-          to="/alerts"
-          className="action-card"
-        >
-          <span>🚨</span>
-
-          <h3>Alerts</h3>
-
-          <p>
-            View nearby disaster alerts
-          </p>
-        </Link>
-
-
-        <Link
-          to="/shelters"
-          className="action-card"
-        >
-          <span>🏠</span>
-
-          <h3>Shelters</h3>
-
-          <p>
-            Find safe shelters nearby
-          </p>
-        </Link>
-
-
-        <Link
-          to="/map"
-          className="action-card"
-        >
-          <span>🗺️</span>
-
-          <h3>Risk Map</h3>
-
-          <p>
-            View disaster risk zones
-          </p>
-        </Link>
-
-
-        <Link
-          to="/sos"
-          className="action-card sos-card"
-        >
-          <span>🆘</span>
-
-          <h3>Emergency SOS</h3>
-
-          <p>
-            Send emergency alert
-          </p>
-        </Link>
-
-      </div>
-
-
-      {/* AI RISK */}
-
-      <h2 className="section-title">
-        AI Safety Assessment
-      </h2>
-
-      <div className="home-ai-card">
-
-        <div className="home-ai-icon">
-          🤖
-        </div>
-
-        <div className="home-ai-content">
-
-          <p>
-            CURRENT RISK LEVEL
-          </p>
-
-          <h2>
-            Low Risk
-          </h2>
-
-          <span>
-            AI confidence: 76%
-          </span>
-
-        </div>
-
-        <div className="home-risk-score">
-          24%
-        </div>
-
-      </div>
-
-
-      {/* NEAREST SHELTER */}
-
-      <h2 className="section-title">
-        Nearest Safe Shelter
-      </h2>
-
-      <div className="nearest-shelter">
-
-        <div className="nearest-icon">
-          🏠
-        </div>
-
-        <div className="nearest-info">
-
-          <h3>
-            Community Relief Centre
-          </h3>
-
-          <p>
-            📍 1.2 km away
-          </p>
-
-          <span>
-            🟢 80 spaces available
-          </span>
-
-        </div>
-
-        <Link
-          to="/map"
-          className="small-navigate"
-        >
-          🧭
-        </Link>
-
-      </div>
-
-
-      {/* LOCAL RISK */}
-
-      <h2 className="section-title">
-        Local Risk Level
-      </h2>
-
-      <div className="risk-card">
-
-        <div className="risk-circle">
-          LOW
-        </div>
-
-        <div>
-
-          <h3>
-            Low Risk Area
-          </h3>
-
-          <p>
-            No major disaster reported in your area.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <BottomNav />
-
-    </div>
-  );
-}
-
-/* ================= ALERTS ================= */
-
-function Alerts() {
-  return (
-    <div className="page">
-
-      <Link to="/" className="back-button">
-        ← Back
-      </Link>
-
-      <h1>Disaster Alerts</h1>
-
-      <p className="page-subtitle">
-        Stay informed about nearby hazards
-      </p>
-
-
-      {/* HIGH ALERT */}
-
-      <div className="alert-card critical">
-
-        <div className="alert-top">
-          <span className="alert-icon">🌧️</span>
-          <span className="badge">HIGH</span>
-        </div>
-
-        <h2>Heavy Rainfall</h2>
-
-        <p>
-          Heavy rainfall is expected in the affected area.
-          Avoid low-lying areas and stay indoors if possible.
-        </p>
-
-        <div className="alert-details">
-          <span>📍 Nearby Area</span>
-          <span>⚠️ Flood Risk: 78%</span>
-        </div>
-
-        <div className="safety-tip">
-          <strong>🛡️ Safety Instructions</strong>
-          <p>
-            Avoid flooded roads, do not cross moving water,
-            and keep emergency supplies ready.
-          </p>
-        </div>
-
-        <Link
-          to="/map"
-          className="alert-map-button"
-        >
-          🗺️ View on Map
-        </Link>
-
-        <span className="alert-time">
-          Updated 10 minutes ago
-        </span>
-
-      </div>
-
-
-      {/* MODERATE ALERT */}
-
-      <div className="alert-card warning">
-
-        <div className="alert-top">
-          <span className="alert-icon">🌊</span>
-          <span className="badge">MODERATE</span>
-        </div>
-
-        <h2>Waterlogging</h2>
-
-        <p>
-          Waterlogging has been reported on nearby roads.
-          Consider alternate routes while travelling.
-        </p>
-
-        <div className="alert-details">
-          <span>📍 Nearby Roads</span>
-          <span>🚧 Travel Risk: Medium</span>
-        </div>
-
-        <div className="safety-tip">
-          <strong>🛡️ Safety Instructions</strong>
-          <p>
-            Avoid waterlogged roads and use safer alternate
-            routes whenever possible.
-          </p>
-        </div>
-
-        <Link
-          to="/map"
-          className="alert-map-button"
-        >
-          🗺️ View on Map
-        </Link>
-
-        <span className="alert-time">
-          Updated 25 minutes ago
-        </span>
-
-      </div>
-
-
-      {/* INFORMATION ALERT */}
-
-      <div className="alert-card info">
-
-        <div className="alert-top">
-          <span className="alert-icon">ℹ️</span>
-          <span className="badge">INFO</span>
-        </div>
-
-        <h2>Safety Advisory</h2>
-
-        <p>
-          Keep your emergency contacts updated and
-          essential supplies ready.
-        </p>
-
-        <div className="alert-details">
-          <span>📍 Your Area</span>
-          <span>✅ Preparedness</span>
-        </div>
-
-        <div className="safety-tip">
-          <strong>🛡️ Safety Instructions</strong>
-          <p>
-            Keep a torch, first-aid kit, drinking water
-            and important documents ready.
-          </p>
-        </div>
-
-        <Link
-          to="/profile"
-          className="alert-map-button"
-        >
-          👤 Check Emergency Info
-        </Link>
-
-        <span className="alert-time">
-          Updated 1 hour ago
-        </span>
-
-      </div>
-
-
-    </div>
-  );
-}
-
-/* ================= SHELTERS ================= */
-
-function Shelters() {
-  return (
-    <div className="page">
-
-      <Link to="/" className="back-button">
-        ← Back
-      </Link>
-
-      <h1>Nearby Shelters</h1>
-
-      <p className="page-subtitle">
-        Safe locations available near you
-      </p>
-
-
-      {/* SHELTER 1 */}
-
-      <div className="shelter-card">
-
-        <div className="shelter-header">
-          <span className="shelter-icon">🏠</span>
-          <span className="available">AVAILABLE</span>
-        </div>
-
-        <h2>Community Relief Centre</h2>
-
-        <p>📍 1.2 km away</p>
-
-        <p>👥 Occupancy: 120 / 200</p>
-
-        <p>🛏️ Available Spaces: 80</p>
-
-        <div className="capacity-bar">
-          <div
-            className="capacity-fill"
-            style={{ width: "60%" }}
-          />
-        </div>
-
-        <div className="shelter-status">
-          🟢 80 spaces available
-        </div>
-
-        <Link
-          to="/map"
-          className="direction-button"
-        >
-          🧭 Get Directions
-        </Link>
-
-      </div>
-
-
-      {/* SHELTER 2 */}
-
-      <div className="shelter-card">
-
-        <div className="shelter-header">
-          <span className="shelter-icon">🏫</span>
-          <span className="available">AVAILABLE</span>
-        </div>
-
-        <h2>Government School Shelter</h2>
-
-        <p>📍 2.4 km away</p>
-
-        <p>👥 Occupancy: 180 / 300</p>
-
-        <p>🛏️ Available Spaces: 120</p>
-
-        <div className="capacity-bar">
-          <div
-            className="capacity-fill"
-            style={{ width: "60%" }}
-          />
-        </div>
-
-        <div className="shelter-status">
-          🟢 120 spaces available
-        </div>
-
-        <Link
-          to="/map"
-          className="direction-button"
-        >
-          🧭 Get Directions
-        </Link>
-
-      </div>
-
-
-      {/* SHELTER 3 */}
-
-      <div className="shelter-card">
-
-        <div className="shelter-header">
-          <span className="shelter-icon">🏥</span>
-          <span className="full-badge">FULL</span>
-        </div>
-
-        <h2>Emergency Care Centre</h2>
-
-        <p>📍 3.1 km away</p>
-
-        <p>👥 Occupancy: 150 / 150</p>
-
-        <p>🛏️ Available Spaces: 0</p>
-
-        <div className="capacity-bar">
-          <div
-            className="capacity-fill full-bar"
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        <div className="shelter-status full-status">
-          🔴 No spaces available
-        </div>
-
-        <button disabled>
-          🚫 Shelter Full
-        </button>
-
-      </div>
-
-
-      {/* SHELTER INFORMATION */}
-
-      <div className="shelter-info">
-
-        <h2>💡 Shelter Information</h2>
-
-        <p>
-          Choose an available shelter and use
-          <strong> Get Directions </strong>
-          to find the safest route.
-        </p>
-
-      </div>
-
-    </div>
-  );
-}
-
-/* ================= SOS ================= */
-
-function SOS() {
-  const [sent, setSent] = useState(false);
-  const [showContacts, setShowContacts] = useState(false);
-
-  const [emergencyContacts, setEmergencyContacts] = useState([]);
-
-useEffect(() => {
-  const saved = localStorage.getItem("emergencyContacts");
-
-  if (saved) {
-    setEmergencyContacts(JSON.parse(saved));
-  }
-}, []);
-
-  const handleSOS = () => {
-    setShowContacts(true);
-  };
-
-  const sendEmergencyAlert = () => {
-    setShowContacts(false);
-    setSent(true);
-  };
-
-  return (
-    <div className="sos-page">
-
-      <Link to="/" className="back-button">
-        ← Back
-      </Link>
-
-      <div className="sos-header">
-        <h1>Emergency SOS</h1>
-        <p>
-          Send an emergency alert with your current location.
-        </p>
-      </div>
-
-      {/* LOCATION */}
-      <div className="sos-location">
-        <span>📍</span>
-
-        <div>
-          <strong>Location Detected</strong>
-
-          <p>
-            Your current location will be shared with
-            emergency contacts during an SOS alert.
-          </p>
-        </div>
-      </div>
-
-      {/* SOS BUTTON */}
-      <div className="sos-button-area">
-
-        <button
-          className="big-sos-button"
-          onClick={handleSOS}
-        >
-          <span>SOS</span>
-          <small>PRESS FOR HELP</small>
-        </button>
-
-      </div>
-
-      {/* CONTACT CONFIRMATION */}
-      {showContacts && (
-        <div className="emergency-confirm">
-
-          <h2>🚨 Send Emergency Alert?</h2>
-
-          <p>
-            Your emergency alert and current location
-            will be shared with:
-          </p>
-
-          <div className="contact-preview">
-
-            {emergencyContacts.map((contact, index) => (
-              <div className="preview-contact" key={index}>
-
-                <span>👤</span>
-
-                <div>
-                  <strong>{contact.name}</strong>
-                  <p>{contact.relation} • {contact.phone}</p>
-                </div>
-
-              </div>
-            ))}
-
-          </div>
-
-          <div className="location-share">
-            📍 <strong>Live location sharing</strong>
-            <span> ON</span>
-          </div>
-
-          <button
-            className="confirm-sos-button"
-            onClick={sendEmergencyAlert}
-          >
-            🚨 Send Emergency Alert
-          </button>
-
-          <button
-            className="cancel-sos-button"
-            onClick={() => setShowContacts(false)}
-          >
-            Cancel
-          </button>
-
-        </div>
-      )}
-
-      {/* SUCCESS */}
-      {sent && (
-        <div className="sos-success">
-
-          <span>✅</span>
-
+      </section>
+
+      {/* AI Safety Assessment */}
+      <section className="risk-card">
+        <div className="section-header">
           <div>
-            <h3>Emergency Alert Sent</h3>
+            <p className="section-label">AI SAFETY ASSESSMENT</p>
+            <h2>Your Current Risk</h2>
+          </div>
+
+          <span className="risk-low">LOW RISK</span>
+        </div>
+
+        <div className="risk-score">
+          <div className="risk-circle">
+            <strong>24%</strong>
+            <span>Risk</span>
+          </div>
+
+          <div className="risk-details">
+            <h3>Low Risk</h3>
 
             <p>
-              Your emergency contacts have been notified
-              and your location has been shared.
+              Current conditions indicate a relatively safe
+              environment in your area.
             </p>
+
+            <div className="confidence">
+              AI Confidence: <strong>76%</strong>
+            </div>
           </div>
-
         </div>
-      )}
+      </section>
 
-      {/* EMERGENCY INFORMATION */}
-      <div className="emergency-info">
-
-        <h2>Emergency Information</h2>
-
-        <div className="info-row">
-          <span>📞</span>
-
+      {/* Nearest Shelter */}
+      <section className="nearest-shelter-card">
+        <div className="section-header">
           <div>
-            <strong>Emergency Services</strong>
-            <p>Call 112 for immediate assistance</p>
+            <p className="section-label">NEAREST SHELTER</p>
+            <h2>Community Relief Centre</h2>
           </div>
+
+          <span className="available">80 spaces</span>
         </div>
 
-        <div className="info-row">
-          <span>📍</span>
+        <p>📍 Approximately 1.2 km away</p>
 
+        <Link to="/shelters" className="card-button">
+          View Shelters →
+        </Link>
+      </section>
+
+      {/* Local Risk */}
+      <section className="local-risk-card">
+        <div className="section-header">
           <div>
-            <strong>Live Location</strong>
-            <p>Location sharing is enabled</p>
+            <p className="section-label">LOCAL RISK</p>
+            <h2>Current Conditions</h2>
           </div>
         </div>
 
-        <div className="info-row">
-          <span>👥</span>
+        <div className="condition-list">
+          <div className="condition-item">
+            <span>🌧️ Rainfall</span>
+            <strong>Moderate</strong>
+          </div>
 
-          <div>
-            <strong>Emergency Contacts</strong>
-            <p>Your saved contacts will be notified</p>
+          <div className="condition-item">
+            <span>🌊 Water Level</span>
+            <strong>Normal</strong>
+          </div>
+
+          <div className="condition-item">
+            <span>🛣️ Roads</span>
+            <strong>Mostly Clear</strong>
           </div>
         </div>
-
-      </div>
+      </section>
 
       <BottomNav />
-
     </div>
   );
 }
 
-/* ================= MAP ================= */
+// ============================================================
+// ALERTS PAGE
+// ============================================================
 
-function Map() {
+function Alerts() {
+  const alerts = [
+    {
+      type: "Heavy Rainfall",
+      level: "HIGH",
+      icon: "🌧️",
+      description:
+        "Heavy rainfall expected nearby. Avoid low-lying areas.",
+      time: "Active now",
+    },
+    {
+      type: "Waterlogging",
+      level: "MODERATE",
+      icon: "🌊",
+      description:
+        "Waterlogging reported in some nearby areas.",
+      time: "Recently updated",
+    },
+    {
+      type: "Safety Advisory",
+      level: "INFO",
+      icon: "ℹ️",
+      description:
+        "Stay updated with official disaster management advisories.",
+      time: "Today",
+    },
+  ];
 
-  const [userLocation, setUserLocation] = useState(null);
-  const [locationError, setLocationError] = useState("");
+  return (
+    <div className="app-page alerts-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">SAFETY UPDATES</p>
+          <h1>Alerts</h1>
+        </div>
+      </header>
 
-  const shelterIcon = new L.Icon({
-    iconUrl:
-      "https://cdn-icons-png.flaticon.com/512/619/619153.png",
-    iconSize: [38, 38],
-  });
+      <div className="alerts-list">
+        {alerts.map((alert, index) => (
+          <div
+            className={`alert-card ${alert.level.toLowerCase()}`}
+            key={index}
+          >
+            <div className="alert-card-top">
+              <div className="alert-icon">{alert.icon}</div>
 
-  const userIcon = new L.Icon({
-    iconUrl:
-      "https://cdn-icons-png.flaticon.com/512/64/64113.png",
-    iconSize: [35, 35],
-  });
+              <div className="alert-main">
+                <div className="alert-name-row">
+                  <h3>{alert.type}</h3>
+
+                  <span
+                    className={`severity ${alert.level.toLowerCase()}`}
+                  >
+                    {alert.level}
+                  </span>
+                </div>
+
+                <p>{alert.description}</p>
+                <small>{alert.time}</small>
+              </div>
+            </div>
+
+            <Link to="/map" className="alert-map-link">
+              View on Map →
+            </Link>
+          </div>
+        ))}
+      </div>
+
+      <section className="preparedness-card">
+        <h2>Stay Prepared</h2>
+
+        <p>
+          Keep your emergency contacts, medical information,
+          essential supplies and evacuation plan ready.
+        </p>
+
+        <div className="preparedness-actions">
+          <Link to="/contacts">Emergency Contacts</Link>
+          <Link to="/medical">Medical Information</Link>
+        </div>
+      </section>
+
+      <BottomNav />
+    </div>
+  );
+}
+
+// ============================================================
+// SHELTERS PAGE
+// ============================================================
+
+function Shelters() {
+  const shelters = [
+    {
+      name: "Community Relief Centre",
+      capacity: 200,
+      occupied: 120,
+      distance: "1.2 km",
+      status: "Available",
+      food: true,
+      water: true,
+      medical: true,
+      position: [28.615, 77.205],
+    },
+    {
+      name: "Government School Shelter",
+      capacity: 300,
+      occupied: 180,
+      distance: "2.4 km",
+      status: "Available",
+      food: true,
+      water: true,
+      medical: false,
+      position: [28.605, 77.225],
+    },
+    {
+      name: "Emergency Care Centre",
+      capacity: 150,
+      occupied: 150,
+      distance: "3.1 km",
+      status: "Full",
+      food: true,
+      water: true,
+      medical: true,
+      position: [28.595, 77.2],
+    },
+  ];
+
+  return (
+    <div className="app-page shelters-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">SAFE LOCATIONS</p>
+          <h1>Relief Shelters</h1>
+        </div>
+      </header>
+
+      <div className="shelter-list">
+        {shelters.map((shelter, index) => {
+          const available = shelter.capacity - shelter.occupied;
+
+          const percentage =
+            (shelter.occupied / shelter.capacity) * 100;
+
+          const directionsUrl =
+            `https://www.google.com/maps/dir/?api=1&destination=` +
+            `${shelter.position[0]},${shelter.position[1]}`;
+
+          return (
+            <div className="shelter-card" key={index}>
+              <div className="shelter-card-header">
+                <div className="shelter-icon">🏠</div>
+
+                <div className="shelter-info">
+                  <h3>{shelter.name}</h3>
+                  <p>📍 {shelter.distance} away</p>
+                </div>
+
+                <span
+                  className={
+                    shelter.status === "Full"
+                      ? "shelter-full"
+                      : "shelter-available"
+                  }
+                >
+                  {shelter.status}
+                </span>
+              </div>
+
+              <div className="capacity-section">
+                <div className="capacity-text">
+                  <span>Occupancy</span>
+                  <strong>
+                    {shelter.occupied} / {shelter.capacity}
+                  </strong>
+                </div>
+
+                <div className="capacity-bar">
+                  <div
+                    className="capacity-fill"
+                    style={{ width: `${percentage}%` }}
+                  ></div>
+                </div>
+
+                <p>
+                  {available > 0
+                    ? `${available} spaces available`
+                    : "No spaces available"}
+                </p>
+              </div>
+
+              <div className="facility-list">
+                <span>{shelter.food ? "✓" : "×"} Food</span>
+                <span>{shelter.water ? "✓" : "×"} Water</span>
+                <span>
+                  {shelter.medical ? "✓" : "×"} Medical
+                </span>
+              </div>
+
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="directions-button"
+              >
+                Get Directions →
+              </a>
+            </div>
+          );
+        })}
+      </div>
+
+      <BottomNav />
+    </div>
+  );
+}
+
+// ============================================================
+// SOS PAGE
+// ============================================================
+
+function Sos() {
+  const [showConfirmation, setShowConfirmation] =
+    useState(false);
+
+  const [sent, setSent] = useState(false);
+
+  const [locationStatus, setLocationStatus] =
+    useState("Getting your location...");
+
+  const [userLocation, setUserLocation] =
+    useState(null);
 
   useEffect(() => {
-
     if (!navigator.geolocation) {
-      setLocationError("Location is not supported by this browser.");
+      setLocationStatus(
+        "Location is not supported by this browser."
+      );
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
 
-        setUserLocation([
+        setLocationStatus("Location ready");
+      },
+      () => {
+        setLocationStatus(
+          "Location permission not available"
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000,
+      }
+    );
+  }, []);
+
+  const sendEmergencyAlert = () => {
+    setSent(true);
+    setShowConfirmation(false);
+  };
+
+  let contacts = [];
+
+  try {
+    contacts = JSON.parse(
+      localStorage.getItem("emergencyContacts") || "[]"
+    );
+  } catch {
+    contacts = [];
+  }
+
+  return (
+    <div className="app-page sos-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">
+            EMERGENCY RESPONSE
+          </p>
+          <h1>SOS</h1>
+        </div>
+      </header>
+
+      {!sent ? (
+        <>
+          <section className="sos-main-card">
+            <div className="sos-large-icon">🆘</div>
+
+            <h2>Emergency SOS</h2>
+
+            <p>
+              Use SOS when you need immediate emergency
+              assistance.
+            </p>
+
+            <button
+              className="sos-button"
+              type="button"
+              onClick={() => setShowConfirmation(true)}
+            >
+              SOS
+            </button>
+
+            <p className="sos-note">
+              Your emergency location can be shared with
+              your emergency contacts.
+            </p>
+          </section>
+
+          <section className="location-status">
+            <span>📍</span>
+
+            <div>
+              <strong>Current Location</strong>
+              <p>{locationStatus}</p>
+
+              {userLocation && (
+                <small>
+                  {userLocation.latitude.toFixed(5)},{" "}
+                  {userLocation.longitude.toFixed(5)}
+                </small>
+              )}
+            </div>
+          </section>
+
+          <section className="emergency-contacts-section">
+            <div className="section-header">
+              <div>
+                <p className="section-label">
+                  EMERGENCY CONTACTS
+                </p>
+
+                <h2>Your Contacts</h2>
+              </div>
+
+              <Link to="/contacts">Edit</Link>
+            </div>
+
+            {contacts.length > 0 ? (
+              contacts.map((contact, index) => (
+                <div
+                  className="contact-card"
+                  key={index}
+                >
+                  <div className="contact-avatar">👤</div>
+
+                  <div>
+                    <strong>{contact.name}</strong>
+                    <p>{contact.relation}</p>
+                    <span>{contact.phone}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <p>
+                  No emergency contacts added yet.
+                </p>
+
+                <Link to="/contacts">
+                  Add Emergency Contact
+                </Link>
+              </div>
+            )}
+          </section>
+
+          {showConfirmation && (
+            <div className="confirmation-overlay">
+              <div className="confirmation-card">
+                <div className="confirmation-icon">
+                  ⚠️
+                </div>
+
+                <h2>Send Emergency Alert?</h2>
+
+                <p>
+                  Your emergency alert will be prepared
+                  with your current location.
+                </p>
+
+                <div className="confirmation-actions">
+                  <button
+                    type="button"
+                    className="cancel-button"
+                    onClick={() =>
+                      setShowConfirmation(false)
+                    }
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    className="confirm-sos-button"
+                    onClick={sendEmergencyAlert}
+                  >
+                    Send SOS
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <section className="sos-success-card">
+          <div className="success-icon">✓</div>
+
+          <h2>Emergency Alert Prepared</h2>
+
+          <p>
+            Your SOS request has been recorded with your
+            current location information.
+          </p>
+
+          <p className="demo-note">
+            Emergency notification sending requires a
+            connected backend/SMS service.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setSent(false)}
+            className="card-button"
+          >
+            Back to SOS
+          </button>
+        </section>
+      )}
+
+      <BottomNav />
+    </div>
+  );
+}
+
+// ============================================================
+// MAP PAGE
+// ============================================================
+
+function Map() {
+  const defaultPosition = [28.6139, 77.209];
+
+  const [userPosition, setUserPosition] =
+    useState(defaultPosition);
+
+  const [locationStatus, setLocationStatus] =
+    useState("Using default location");
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserPosition([
           position.coords.latitude,
           position.coords.longitude,
         ]);
 
+        setLocationStatus("Your current location");
       },
-
       () => {
-        setLocationError(
-          "Location permission denied. Please allow location access."
+        setLocationStatus(
+          "Location unavailable - showing Delhi"
         );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000,
       }
     );
-
   }, []);
 
+  const shelters = [
+    {
+      name: "Community Relief Centre",
+      position: [28.615, 77.205],
+      capacity: "80 spaces available",
+    },
+    {
+      name: "Government School Shelter",
+      position: [28.605, 77.225],
+      capacity: "120 spaces available",
+    },
+  ];
+
   return (
-    <div className="page">
+    <div className="app-page map-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">
+            DISASTER INTELLIGENCE
+          </p>
 
-      <Link to="/" className="back-button">
-        ← Back
-      </Link>
+          <h1>Safety Map</h1>
+        </div>
+      </header>
 
-      <h1>Disaster Risk Map</h1>
-
-      <p className="page-subtitle">
-        AI-powered risk zones and nearby shelters
-      </p>
-
-
-      {/* LOCATION STATUS */}
-
-      <div className="location-status">
-
+      <section className="map-status-card">
         <span>📍</span>
 
         <div>
-          <strong>
-            {userLocation
-              ? "Your Location Detected"
-              : "Detecting Your Location..."}
-          </strong>
+          <strong>{locationStatus}</strong>
 
           <p>
-            {userLocation
-              ? "Your current location is shown on the map."
-              : "Please allow location permission."}
+            Disaster risk and safe shelter information
           </p>
         </div>
+      </section>
 
-      </div>
-
-
-      {locationError && (
-        <div className="location-error">
-          ⚠️ {locationError}
-        </div>
-      )}
-
-
-      {/* MAP */}
-
-      <div className="real-map">
-
+      <div className="map-container">
         <MapContainer
-          center={userLocation || [28.6139, 77.2090]}
+          center={userPosition}
           zoom={12}
           scrollWheelZoom={true}
+          style={{
+            height: "100%",
+            width: "100%",
+          }}
         >
-
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-
-          {/* USER LOCATION */}
-
-          {userLocation && (
-            <Marker
-              position={userLocation}
-              icon={userIcon}
-            >
-              <Popup>
-                📍 <strong>You are here</strong>
-                <br />
-                Your current location
-              </Popup>
-            </Marker>
-          )}
-
-
-          {/* HIGH RISK */}
-
-          <Circle
-            center={[28.625, 77.225]}
-            radius={1800}
-            pathOptions={{
-              color: "#e63946",
-              fillColor: "#e63946",
-              fillOpacity: 0.25,
-            }}
-          >
-
-            <Popup>
-              🔴 High Risk Zone
-              <br />
-              Flood probability: 78%
-            </Popup>
-
-          </Circle>
-
-
-          {/* MEDIUM RISK */}
-
-          <Circle
-            center={[28.595, 77.19]}
-            radius={1400}
-            pathOptions={{
-              color: "#f4a261",
-              fillColor: "#f4a261",
-              fillOpacity: 0.25,
-            }}
-          >
-
-            <Popup>
-              🟠 Medium Risk Zone
-              <br />
-              Flood probability: 46%
-            </Popup>
-
-          </Circle>
-
-
-          {/* SAFE ZONE */}
-
-          <Circle
-            center={[28.64, 77.18]}
-            radius={1000}
-            pathOptions={{
-              color: "#2eb47e",
-              fillColor: "#2eb47e",
-              fillOpacity: 0.25,
-            }}
-          >
-
-            <Popup>
-              🟢 Safe Zone
-            </Popup>
-
-          </Circle>
-
-
-          {/* SHELTER 1 */}
-
           <Marker
-            position={[28.615, 77.205]}
-            icon={shelterIcon}
+            position={userPosition}
+            icon={userIcon}
           >
-
             <Popup>
-              🏠 Community Relief Centre
+              <strong>Your Location</strong>
               <br />
-              Capacity: 120 / 200
-              <br />
-              <br />
-
-              <a
-                href="https://www.google.com/maps/dir/?api=1&destination=28.615,77.205"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                🧭 Navigate to Shelter
-              </a>
-
+              Current position
             </Popup>
-
           </Marker>
 
-
-          {/* SHELTER 2 */}
-
-          <Marker
-            position={[28.605, 77.225]}
-            icon={shelterIcon}
+          <Circle
+            center={[28.625, 77.195]}
+            radius={1500}
+            pathOptions={{
+              color: "red",
+              fillColor: "red",
+              fillOpacity: 0.18,
+            }}
           >
-
             <Popup>
-              🏫 Government School Shelter
+              <strong>HIGH RISK</strong>
               <br />
-              Capacity: 180 / 300
-              <br />
-              <br />
-
-              <a
-                href="https://www.google.com/maps/dir/?api=1&destination=28.605,77.225"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                🧭 Navigate to Shelter
-              </a>
-
+              Heavy rainfall risk area
             </Popup>
+          </Circle>
 
-          </Marker>
+          <Circle
+            center={[28.605, 77.22]}
+            radius={1200}
+            pathOptions={{
+              color: "orange",
+              fillColor: "orange",
+              fillOpacity: 0.15,
+            }}
+          >
+            <Popup>
+              <strong>MODERATE RISK</strong>
+              <br />
+              Waterlogging possible
+            </Popup>
+          </Circle>
 
+          <Circle
+            center={[28.595, 77.2]}
+            radius={900}
+            pathOptions={{
+              color: "green",
+              fillColor: "green",
+              fillOpacity: 0.15,
+            }}
+          >
+            <Popup>
+              <strong>SAFE ZONE</strong>
+              <br />
+              Lower current risk
+            </Popup>
+          </Circle>
+
+          {shelters.map((shelter, index) => {
+            const directionsUrl =
+              `https://www.google.com/maps/dir/?api=1&destination=` +
+              `${shelter.position[0]},${shelter.position[1]}`;
+
+            return (
+              <Marker
+                key={index}
+                position={shelter.position}
+                icon={shelterIcon}
+              >
+                <Popup>
+                  <strong>{shelter.name}</strong>
+                  <br />
+                  {shelter.capacity}
+                  <br />
+                  <br />
+
+                  <a
+                    href={directionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Get Directions
+                  </a>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
-
       </div>
 
+      <section className="map-legend">
+        <h3>Map Legend</h3>
 
-      {/* RISK LEGEND */}
-
-      <div className="map-legend">
-
-        <h2>Risk Zones</h2>
-
-        <div className="legend-row">
-
-          <span className="legend-dot high"></span>
-
-          <div>
-            <strong>High Risk</strong>
-            <p>Immediate caution required</p>
-          </div>
-
-        </div>
-
-
-        <div className="legend-row">
-
-          <span className="legend-dot medium"></span>
-
-          <div>
-            <strong>Medium Risk</strong>
-            <p>Stay alert and prepared</p>
-          </div>
-
-        </div>
-
-
-        <div className="legend-row">
-
-          <span className="legend-dot safe"></span>
-
-          <div>
-            <strong>Safe Zone</strong>
-            <p>No major risk detected</p>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* AI RISK */}
-
-      <div className="ai-risk-card">
-
-        <div>
-
-          <p>AI RISK ASSESSMENT</p>
-
-          <h2>Low Risk</h2>
-
+        <div className="legend-items">
           <span>
-            Prediction confidence: 76%
+            <i className="legend-dot high"></i>
+            High Risk
           </span>
 
-        </div>
-
-        <div className="risk-score-circle">
-          24%
-        </div>
-
-      </div>
-
-
-      {/* SHELTERS */}
-
-      <Link
-        to="/shelters"
-        className="map-shelter-button"
-      >
-        🏠 View Nearby Shelters
-      </Link>
-
-
-      {/* NAVIGATION */}
-
-      <div className="navigation-card">
-
-        <div className="navigation-icon">
-          🧭
-        </div>
-
-        <div className="navigation-content">
-
-          <h2>Nearest Shelter</h2>
-
-          <p>
-            Community Relief Centre
-          </p>
-
           <span>
-            📍 1.2 km away
+            <i className="legend-dot moderate"></i>
+            Moderate Risk
           </span>
 
+          <span>
+            <i className="legend-dot safe"></i>
+            Safe Zone
+          </span>
+
+          <span>🏠 Relief Shelter</span>
+        </div>
+      </section>
+
+      <section className="navigation-card">
+        <div className="section-header">
+          <div>
+            <p className="section-label">
+              AI RISK ASSESSMENT
+            </p>
+
+            <h2>Current Area</h2>
+          </div>
+
+          <span className="risk-low">LOW</span>
         </div>
 
-        <a
-          href="https://www.google.com/maps/dir/?api=1&destination=28.615,77.205"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="navigate-button"
-        >
-          Navigate
-        </a>
+        <p>
+          Your current area has a low estimated disaster
+          risk based on the available demo conditions.
+        </p>
+      </section>
 
-      </div>
-
-
+      <BottomNav />
     </div>
   );
 }
-/* ================= PROFILE ================= */
+
+// ============================================================
+// PROFILE PAGE
+// ============================================================
 
 function Profile() {
-
   const navigate = useNavigate();
 
+  const mobile =
+    localStorage.getItem("userMobile") ||
+    "Not available";
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userMobile");
+
+    navigate("/login", { replace: true });
+  };
+
   return (
-    <div className="page profile-page">
-
-      <Link to="/" className="back-button">
-        ← Back
-      </Link>
-
-
-      <div className="profile-header">
-
-        <div className="profile-big-icon">
-          👤
+    <div className="app-page profile-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">ACCOUNT</p>
+          <h1>Profile</h1>
         </div>
+      </header>
 
-        <h1>My Profile</h1>
+      <section className="profile-card">
+        <div className="profile-large-icon">👤</div>
 
-        <p>
-          Manage your safety information
-        </p>
+        <h2>SafeGuard User</h2>
 
-      </div>
+        <p>+91 {mobile}</p>
+      </section>
 
-
-      <div className="profile-card">
-
-        <div className="profile-row">
-          <span>👤</span>
-
-          <div>
-            <p>Name</p>
-            <strong>Citizen User</strong>
-          </div>
-        </div>
-
-
-        <div className="profile-row">
-          <span>📱</span>
-
-          <div>
-            <p>Mobile Number</p>
-            <strong>+91 XXXXX XXXXX</strong>
-          </div>
-        </div>
-
-
-        <div className="profile-row">
-          <span>📍</span>
-
-          <div>
-            <p>Location</p>
-            <strong>Location Enabled</strong>
-          </div>
-        </div>
-
-      </div>
-
-
-      <h2 className="profile-section-title">
-        Emergency Information
-      </h2>
-
-
-      <div className="profile-options">
-
-        <Link
-          to="/medical"
-          className="profile-option"
-        >
-          <span>🩸</span>
-
-          <div>
-            <strong>Medical Information</strong>
-            <p>Blood group, allergies, conditions</p>
-          </div>
-
-          <span className="arrow">›</span>
-        </Link>
-
-
-        <Link
-          to="/contacts"
-          className="profile-option"
-        >
-          <span>👨‍👩‍👧</span>
+      <section className="profile-options">
+        <Link to="/contacts" className="profile-option">
+          <span>📞</span>
 
           <div>
             <strong>Emergency Contacts</strong>
-            <p>Add people to contact during emergencies</p>
+            <p>Manage your emergency contacts</p>
           </div>
 
-          <span className="arrow">›</span>
+          <span>›</span>
         </Link>
 
-
-        <div className="profile-option">
-
-          <span>📍</span>
+        <Link to="/medical" className="profile-option">
+          <span>🏥</span>
 
           <div>
-            <strong>Location Sharing</strong>
-            <p>Location sharing is currently ON</p>
+            <strong>Medical Information</strong>
+            <p>Save important medical details</p>
           </div>
 
-          <span className="toggle-on">ON</span>
+          <span>›</span>
+        </Link>
 
-        </div>
+        <Link to="/map" className="profile-option">
+          <span>🗺️</span>
 
-      </div>
+          <div>
+            <strong>Safety Map</strong>
+            <p>View risk zones and shelters</p>
+          </div>
 
+          <span>›</span>
+        </Link>
+      </section>
 
       <button
+        type="button"
         className="logout-button"
-        onClick={() => navigate("/login")}
+        onClick={handleLogout}
       >
-        Logout
+        Log Out
       </button>
 
+      <BottomNav />
     </div>
   );
 }
 
-
-/* ================= MEDICAL INFORMATION ================= */
+// ============================================================
+// MEDICAL PAGE
+// ============================================================
 
 function Medical() {
-
-  const navigate = useNavigate();
-
-  const [medical, setMedical] = useState({
-    bloodGroup: "",
-    allergies: "",
-    conditions: "",
-    medications: "",
+  const [medical, setMedical] = useState(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("medicalInformation") || "{}"
+      );
+    } catch {
+      return {};
+    }
   });
 
   const [saved, setSaved] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
-    setMedical({
-      ...medical,
-      [e.target.name]: e.target.value,
-    });
-
-    setSaved(false);
+    setMedical((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
+  const handleSave = (event) => {
+    event.preventDefault();
 
-  const handleSave = () => {
+    localStorage.setItem(
+      "medicalInformation",
+      JSON.stringify(medical)
+    );
 
     setSaved(true);
 
-    alert("Medical information saved successfully!");
+    setTimeout(() => {
+      setSaved(false);
+    }, 2500);
   };
 
-
   return (
-    <div className="page">
+    <div className="app-page medical-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">
+            EMERGENCY INFORMATION
+          </p>
 
-      <button
-        className="back-button"
-        onClick={() => navigate("/profile")}
-      >
-        ← Back to Profile
-      </button>
+          <h1>Medical Information</h1>
+        </div>
+      </header>
 
+      <section className="form-card">
+        <p className="form-intro">
+          Store important medical information that can
+          help during an emergency.
+        </p>
 
-      <h1>Medical Information</h1>
+        <form onSubmit={handleSave}>
+          <div className="form-group">
+            <label htmlFor="bloodGroup">
+              Blood Group
+            </label>
 
-      <p className="page-subtitle">
-        This information can help responders during emergencies.
-      </p>
+            <input
+              id="bloodGroup"
+              name="bloodGroup"
+              value={medical.bloodGroup || ""}
+              onChange={handleChange}
+              placeholder="e.g. O+"
+            />
+          </div>
 
+          <div className="form-group">
+            <label htmlFor="allergies">
+              Allergies
+            </label>
 
-      <div className="form-card">
+            <textarea
+              id="allergies"
+              name="allergies"
+              value={medical.allergies || ""}
+              onChange={handleChange}
+              placeholder="Enter known allergies"
+            />
+          </div>
 
-        <label>Blood Group</label>
+          <div className="form-group">
+            <label htmlFor="conditions">
+              Medical Conditions
+            </label>
 
-        <select
-          name="bloodGroup"
-          value={medical.bloodGroup}
-          onChange={handleChange}
-        >
+            <textarea
+              id="conditions"
+              name="conditions"
+              value={medical.conditions || ""}
+              onChange={handleChange}
+              placeholder="Enter important medical conditions"
+            />
+          </div>
 
-          <option value="">
-            Select blood group
-          </option>
+          <div className="form-group">
+            <label htmlFor="medications">
+              Current Medications
+            </label>
 
-          <option>A+</option>
-          <option>A-</option>
-          <option>B+</option>
-          <option>B-</option>
-          <option>AB+</option>
-          <option>AB-</option>
-          <option>O+</option>
-          <option>O-</option>
+            <textarea
+              id="medications"
+              name="medications"
+              value={medical.medications || ""}
+              onChange={handleChange}
+              placeholder="Enter current medications"
+            />
+          </div>
 
-        </select>
+          <div className="form-group">
+            <label htmlFor="notes">
+              Additional Notes
+            </label>
 
+            <textarea
+              id="notes"
+              name="notes"
+              value={medical.notes || ""}
+              onChange={handleChange}
+              placeholder="Any other important information"
+            />
+          </div>
 
-        <label>Allergies</label>
-
-        <input
-          name="allergies"
-          value={medical.allergies}
-          onChange={handleChange}
-          placeholder="Example: Penicillin"
-        />
-
-
-        <label>Medical Conditions</label>
-
-        <textarea
-          name="conditions"
-          value={medical.conditions}
-          onChange={handleChange}
-          placeholder="Example: Asthma, diabetes..."
-        />
-
-
-        <label>Current Medications</label>
-
-        <textarea
-          name="medications"
-          value={medical.medications}
-          onChange={handleChange}
-          placeholder="Enter current medicines"
-        />
-
-
-        <button
-          className="save-button"
-          onClick={handleSave}
-        >
-          💾 Save Medical Information
-        </button>
-
+          <button
+            type="submit"
+            className="save-button"
+          >
+            Save Medical Information
+          </button>
+        </form>
 
         {saved && (
           <div className="saved-message">
-            ✅ Information saved successfully
+            ✓ Medical information saved successfully.
           </div>
         )}
+      </section>
 
-      </div>
-
+      <BottomNav />
     </div>
   );
 }
 
-
-/* ================= EMERGENCY CONTACTS ================= */
+// ============================================================
+// EMERGENCY CONTACTS PAGE
+// ============================================================
 
 function Contacts() {
   const [contacts, setContacts] = useState(() => {
-    const saved = localStorage.getItem("emergencyContacts");
-
-    return saved
-      ? JSON.parse(saved)
-      : [{ name: "", phone: "", relation: "" }];
+    try {
+      return JSON.parse(
+        localStorage.getItem("emergencyContacts") || "[]"
+      );
+    } catch {
+      return [];
+    }
   });
 
-  const [savedMessage, setSavedMessage] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [relation, setRelation] = useState("");
+  const [error, setError] = useState("");
 
-  const addContact = () => {
-    if (contacts.length >= 3) {
-      alert("You can add maximum 3 emergency contacts.");
-      return;
-    }
-
-    setContacts([
-      ...contacts,
-      { name: "", phone: "", relation: "" },
-    ]);
-  };
-
-  const updateContact = (index, field, value) => {
-    const updatedContacts = [...contacts];
-
-    updatedContacts[index][field] = value;
-
+  const saveContacts = (updatedContacts) => {
     setContacts(updatedContacts);
-  };
-
-  const removeContact = (index) => {
-    if (contacts.length === 1) {
-      alert("At least one emergency contact is required.");
-      return;
-    }
-
-    setContacts(
-      contacts.filter((_, i) => i !== index)
-    );
-  };
-
-  const saveContacts = () => {
-    const validContacts = contacts.filter(
-      (contact) =>
-        contact.name.trim() !== "" &&
-        contact.phone.trim() !== ""
-    );
-
-    if (validContacts.length === 0) {
-      alert("Please enter at least one emergency contact.");
-      return;
-    }
 
     localStorage.setItem(
       "emergencyContacts",
-      JSON.stringify(validContacts)
+      JSON.stringify(updatedContacts)
+    );
+  };
+
+  const addContact = (event) => {
+    event.preventDefault();
+    setError("");
+
+    if (contacts.length >= 3) {
+      setError(
+        "You can add a maximum of 3 emergency contacts."
+      );
+      return;
+    }
+
+    const cleanPhone = phone.replace(/\D/g, "");
+
+    if (!name.trim()) {
+      setError("Please enter the contact name.");
+      return;
+    }
+
+    if (cleanPhone.length !== 10) {
+      setError(
+        "Please enter a valid 10-digit phone number."
+      );
+      return;
+    }
+
+    if (!relation.trim()) {
+      setError("Please enter the relation.");
+      return;
+    }
+
+    const newContact = {
+      name: name.trim(),
+      phone: cleanPhone,
+      relation: relation.trim(),
+    };
+
+    saveContacts([...contacts, newContact]);
+
+    setName("");
+    setPhone("");
+    setRelation("");
+  };
+
+  const deleteContact = (index) => {
+    const updatedContacts = contacts.filter(
+      (_, currentIndex) => currentIndex !== index
     );
 
-    setContacts(validContacts);
-    setSavedMessage(true);
-
-    setTimeout(() => {
-      setSavedMessage(false);
-    }, 3000);
+    saveContacts(updatedContacts);
   };
 
   return (
-    <div className="page">
+    <div className="app-page contacts-page">
+      <header className="page-header">
+        <div>
+          <p className="section-label">
+            EMERGENCY RESPONSE
+          </p>
 
-      <Link to="/profile" className="back-button">
-        ← Back
-      </Link>
+          <h1>Emergency Contacts</h1>
+        </div>
+      </header>
 
-      <h1>Emergency Contacts</h1>
+      <section className="contacts-info-card">
+        <span>📞</span>
 
-      <p className="page-subtitle">
-        These people will be notified during an emergency.
-      </p>
+        <p>
+          Add people who should be contacted during
+          an emergency.
+        </p>
+      </section>
 
-      {contacts.map((contact, index) => (
-        <div className="contact-card" key={index}>
+      <section className="saved-contacts">
+        <div className="section-header">
+          <div>
+            <p className="section-label">
+              SAVED CONTACTS
+            </p>
 
-          <div className="contact-card-header">
+            <h2>{contacts.length} / 3 Contacts</h2>
+          </div>
+        </div>
 
-            <h2>
-              Contact {index + 1}
-            </h2>
+        {contacts.length === 0 ? (
+          <div className="empty-state">
+            <p>No emergency contacts added yet.</p>
+          </div>
+        ) : (
+          contacts.map((contact, index) => (
+            <div
+              className="saved-contact-card"
+              key={index}
+            >
+              <div className="contact-avatar">👤</div>
 
-            {contacts.length > 1 && (
+              <div className="contact-details">
+                <strong>{contact.name}</strong>
+                <p>{contact.relation}</p>
+                <span>+91 {contact.phone}</span>
+              </div>
+
               <button
-                className="remove-contact"
-                onClick={() => removeContact(index)}
+                type="button"
+                className="delete-contact"
+                onClick={() => deleteContact(index)}
               >
-                Remove
+                ×
               </button>
-            )}
+            </div>
+          ))
+        )}
+      </section>
 
+      {contacts.length < 3 && (
+        <section className="form-card">
+          <div className="section-header">
+            <div>
+              <p className="section-label">
+                NEW CONTACT
+              </p>
+
+              <h2>Add Contact</h2>
+            </div>
           </div>
 
-          <label>Full Name</label>
+          <form onSubmit={addContact}>
+            <div className="form-group">
+              <label htmlFor="contactName">
+                Name
+              </label>
 
-          <input
-            type="text"
-            placeholder="Enter full name"
-            value={contact.name}
-            onChange={(e) =>
-              updateContact(
-                index,
-                "name",
-                e.target.value
-              )
-            }
-          />
+              <input
+                id="contactName"
+                type="text"
+                value={name}
+                onChange={(event) =>
+                  setName(event.target.value)
+                }
+                placeholder="Enter name"
+              />
+            </div>
 
-          <label>Mobile Number</label>
+            <div className="form-group">
+              <label htmlFor="contactPhone">
+                Phone Number
+              </label>
 
-          <input
-            type="tel"
-            placeholder="Enter mobile number"
-            maxLength="10"
-            value={contact.phone}
-            onChange={(e) =>
-              updateContact(
-                index,
-                "phone",
-                e.target.value.replace(/\D/g, "")
-              )
-            }
-          />
+              <div className="mobile-input-wrapper">
+                <span className="country-code">+91</span>
 
-          <label>Relation</label>
+                <input
+                  id="contactPhone"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={phone}
+                  onChange={(event) =>
+                    setPhone(
+                      event.target.value.replace(
+                        /\D/g,
+                        ""
+                      )
+                    )
+                  }
+                  placeholder="Enter phone number"
+                />
+              </div>
+            </div>
 
-          <input
-            type="text"
-            placeholder="Example: Mother, Father, Friend"
-            value={contact.relation}
-            onChange={(e) =>
-              updateContact(
-                index,
-                "relation",
-                e.target.value
-              )
-            }
-          />
+            <div className="form-group">
+              <label htmlFor="contactRelation">
+                Relation
+              </label>
 
-        </div>
-      ))}
+              <input
+                id="contactRelation"
+                type="text"
+                value={relation}
+                onChange={(event) =>
+                  setRelation(event.target.value)
+                }
+                placeholder="e.g. Mother, Father, Friend"
+              />
+            </div>
 
-      <button
-        className="add-contact-button"
-        onClick={addContact}
-      >
-        ➕ Add Emergency Contact
-      </button>
+            {error && (
+              <div className="form-error">
+                {error}
+              </div>
+            )}
 
-      <button
-        className="save-button"
-        onClick={saveContacts}
-      >
-        💾 Save Contacts
-      </button>
-
-      {savedMessage && (
-        <div className="saved-message">
-          ✅ Emergency contacts saved successfully!
-        </div>
+            <button
+              type="submit"
+              className="save-button"
+            >
+              Add Emergency Contact
+            </button>
+          </form>
+        </section>
       )}
 
+      <BottomNav />
     </div>
   );
 }
 
-/* ================== BOTTOM NAV ================== */
+// ============================================================
+// BOTTOM NAVIGATION
+// ============================================================
 
 function BottomNav() {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const getClassName = (path, extra = "") =>
+    currentPath === path
+      ? `nav-item active ${extra}`
+      : `nav-item ${extra}`;
 
   return (
-    <div className="bottom-nav">
-
-      <Link to="/" className="nav-item">
-        🏠
-        <span>Home</span>
+    <nav className="bottom-nav">
+      <Link to="/" className={getClassName("/")}>
+        <span>🏠</span>
+        <small>Home</small>
       </Link>
 
-      <Link to="/alerts" className="nav-item">
-        🚨
-        <span>Alerts</span>
+      <Link
+        to="/alerts"
+        className={getClassName("/alerts")}
+      >
+        <span>🚨</span>
+        <small>Alerts</small>
       </Link>
 
-      <Link to="/sos" className="nav-item sos-nav">
-        🆘
-        <span>SOS</span>
+      <Link
+        to="/sos"
+        className={getClassName("/sos", "sos-nav")}
+      >
+        <span>🆘</span>
+        <small>SOS</small>
       </Link>
 
-      <Link to="/shelters" className="nav-item">
-        🏫
-        <span>Shelters</span>
+      <Link
+        to="/shelters"
+        className={getClassName("/shelters")}
+      >
+        <span>🏠</span>
+        <small>Shelters</small>
       </Link>
 
-      <Link to="/profile" className="nav-item">
-        <span>Profile</span>
+      <Link
+        to="/profile"
+        className={getClassName("/profile")}
+      >
+        <span>👤</span>
+        <small>Profile</small>
       </Link>
-
-    </div>
+    </nav>
   );
 }
 
-/* ================== APP ================== */
+// ============================================================
+// PROTECTED ROUTE
+// ============================================================
+
+function ProtectedRoute({ children }) {
+  const isLoggedIn =
+    localStorage.getItem("isLoggedIn") === "true";
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+// ============================================================
+// MAIN APP
+// ============================================================
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route 
-          path="/login" 
-          element={<Login />} 
+        {/* PAGE 1 - LOGIN */}
+        <Route
+          path="/login"
+          element={<Login />}
         />
 
-        <Route 
-          path="/" 
-          element={<Home />} 
+        {/* PAGE 2 - HOME */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
         />
 
-        <Route 
-          path="/alerts" 
-          element={<Alerts />} 
+        {/* ALERTS */}
+        <Route
+          path="/alerts"
+          element={
+            <ProtectedRoute>
+              <Alerts />
+            </ProtectedRoute>
+          }
         />
 
-        <Route 
-          path="/shelters" 
-          element={<Shelters />} 
+        {/* SHELTERS */}
+        <Route
+          path="/shelters"
+          element={
+            <ProtectedRoute>
+              <Shelters />
+            </ProtectedRoute>
+          }
         />
 
-        <Route 
+        {/* SOS */}
+        <Route
           path="/sos"
-          element={<SOS />}
-    />
+          element={
+            <ProtectedRoute>
+              <Sos />
+            </ProtectedRoute>
+          }
+        />
 
-    <Route 
-      path="/map"
-      element={<Map />}
-    />
+        {/* MAP */}
+        <Route
+          path="/map"
+          element={
+            <ProtectedRoute>
+              <Map />
+            </ProtectedRoute>
+          }
+        />
 
-    <Route 
-      path="/profile"
-      element={<Profile />}
-    />
+        {/* PROFILE */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
 
-    <Route 
-      path="/medical"
-      element={<Medical />}
-    />
+        {/* MEDICAL */}
+        <Route
+          path="/medical"
+          element={
+            <ProtectedRoute>
+              <Medical />
+            </ProtectedRoute>
+          }
+        />
 
-    <Route 
-      path="/contacts"
-      element={<Contacts />}
-    />
+        {/* CONTACTS */}
+        <Route
+          path="/contacts"
+          element={
+            <ProtectedRoute>
+              <Contacts />
+            </ProtectedRoute>
+          }
+        />
 
-  </Routes>
-
-</BrowserRouter>
-
-);
+        {/* UNKNOWN URL */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

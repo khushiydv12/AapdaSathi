@@ -1,0 +1,17 @@
+{
+  "module": "M2_Risk_Prediction",
+  "district": "East Khasi Hills",
+  "state": "Meghalaya",
+  "coordinates": [25.5788, 91.8933],
+  "environmental_metrics": {
+    "rainfall_mm": 120,
+    "soil_moisture_pct": 85,
+    "terrain_slope_degrees": 40
+  },
+  "assessment": {
+    "severity": "CRITICAL",
+    "hazard_type": "Landslide & Flash Flood",
+    "road_status": "BLOCKED (Impassable)",
+    "isolation_status": "ISOLATED - Air Drop Required"
+  }
+}

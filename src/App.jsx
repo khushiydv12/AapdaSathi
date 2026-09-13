@@ -30,57 +30,115 @@ function Login() {
     if (mobile.length === 10) {
       navigate("/");
     } else {
-      alert("Please enter a valid 10 digit mobile number");
+      alert("Please enter a valid 10-digit mobile number.");
     }
   };
 
   return (
-    <div className="login-page">
+    <div className="creative-login">
+
+      {/* DISASTER BACKGROUND */}
+
+      <div className="disaster-scene rainfall">
+        <div className="disaster-icon">🌧️</div>
+        <h2>Heavy Rainfall</h2>
+        <p>Stay alert during extreme weather</p>
+        <div className="rain-drops">⋮ ⋮ ⋮ ⋮ ⋮</div>
+      </div>
+
+
+      <div className="disaster-scene flood">
+        <div className="disaster-icon">🌊</div>
+        <h2>Flood</h2>
+        <p>Avoid flooded roads and low areas</p>
+        <div className="wave">〰〰〰〰</div>
+      </div>
+
+
+      <div className="disaster-scene earthquake">
+        <div className="disaster-icon">🌍</div>
+        <h2>Earthquake</h2>
+        <p>Drop, cover and hold</p>
+        <div className="shake-line">〰〰〰</div>
+      </div>
+
+
+      <div className="disaster-scene landslide">
+        <div className="disaster-icon">⛰️</div>
+        <h2>Landslide</h2>
+        <p>Stay away from unstable slopes</p>
+        <div className="rocks">● ● ●</div>
+      </div>
+
+
+      {/* DARK OVERLAY */}
+
+      <div className="login-overlay"></div>
+
+
+      {/* CENTER LOGIN CARD */}
+
       <div className="login-card">
 
-        <div className="login-logo">🛡️</div>
+        <div className="login-logo">
+          🛡️
+        </div>
 
         <h1>SafeGuard</h1>
 
-        <p className="login-subtitle">
+        <p className="login-tagline">
           Your personal disaster safety companion
         </p>
 
+        <div className="login-divider"></div>
+
         <h2>Welcome Back</h2>
 
-        <p className="login-text">
-          Sign in to access your safety dashboard
+        <p className="login-description">
+          Stay informed. Stay prepared. Stay safe.
         </p>
+
+
+        {/* MOBILE NUMBER */}
 
         <label>Mobile Number</label>
 
         <div className="mobile-input">
+
           <span>+91</span>
 
           <input
             type="tel"
             placeholder="Enter mobile number"
-            value={mobile}
             maxLength="10"
+            value={mobile}
             onChange={(e) =>
-              setMobile(e.target.value.replace(/\D/g, ""))
+              setMobile(
+                e.target.value.replace(/\D/g, "")
+              )
             }
           />
+
         </div>
 
-        <button className="login-button" onClick={handleLogin}>
-          Continue
+
+        <button
+          className="login-button"
+          onClick={handleLogin}
+        >
+          Continue →
         </button>
 
-        <p className="login-footer">
-          Your information is kept secure
+
+        <p className="login-safety">
+          🔒 Your information is kept secure
         </p>
 
       </div>
+
     </div>
   );
 }
-
 
 /* ================= HOME ================= */
 

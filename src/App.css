@@ -2144,3 +2144,754 @@ select:focus {
     min-height: 66px;
   }
 }
+/* ================= CREATIVE LOGIN ================= */
+
+.creative-login {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #07111f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
+
+
+/* ================= DISASTER SCENES ================= */
+
+.disaster-scene {
+  position: absolute;
+  width: 45%;
+  height: 45%;
+  padding: 30px;
+  color: white;
+  overflow: hidden;
+  opacity: 0.9;
+}
+
+.disaster-scene h2 {
+  font-size: 25px;
+  margin: 12px 0 6px;
+}
+
+.disaster-scene p {
+  font-size: 12px;
+  opacity: 0.8;
+  max-width: 220px;
+}
+
+.disaster-icon {
+  font-size: 55px;
+  animation: floating 3s ease-in-out infinite;
+}
+
+
+/* RAINFALL */
+
+.rainfall {
+  top: 0;
+  left: 0;
+  background: linear-gradient(
+    135deg,
+    #163b63,
+    #285d86
+  );
+  border-radius: 0 0 100px 0;
+}
+
+.rain-drops {
+  font-size: 40px;
+  letter-spacing: 12px;
+  animation: rainMove 1.5s linear infinite;
+}
+
+
+/* FLOOD */
+
+.flood {
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    135deg,
+    #164d68,
+    #237c91
+  );
+  border-radius: 0 100px 0 0;
+}
+
+.wave {
+  font-size: 45px;
+  animation: waveMove 2s ease-in-out infinite;
+}
+
+
+/* EARTHQUAKE */
+
+.earthquake {
+  top: 0;
+  right: 0;
+  background: linear-gradient(
+    135deg,
+    #553c32,
+    #85553c
+  );
+  border-radius: 0 0 0 100px;
+  text-align: right;
+}
+
+.earthquake p {
+  margin-left: auto;
+}
+
+.shake-line {
+  font-size: 45px;
+  animation: shake 0.8s infinite;
+}
+
+
+/* LANDSLIDE */
+
+.landslide {
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    135deg,
+    #354b35,
+    #60734d
+  );
+  border-radius: 100px 0 0 0;
+  text-align: right;
+}
+
+.landslide p {
+  margin-left: auto;
+}
+
+.rocks {
+  font-size: 30px;
+  letter-spacing: 12px;
+  animation: rocksMove 2s ease-in-out infinite;
+}
+
+
+/* ================= OVERLAY ================= */
+
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 12, 25, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+
+/* ================= LOGIN CARD ================= */
+
+.login-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 390px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  padding: 32px 28px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  animation: loginAppear 0.8s ease;
+}
+
+
+.login-logo {
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 12px;
+  border-radius: 20px;
+  background: #5367d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  box-shadow: 0 10px 25px rgba(83, 103, 217, 0.3);
+}
+
+
+.login-card h1 {
+  font-size: 30px;
+  color: #172033;
+  margin-bottom: 5px;
+}
+
+
+.login-tagline {
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+.login-divider {
+  width: 50px;
+  height: 4px;
+  border-radius: 10px;
+  background: #5367d9;
+  margin: 20px auto;
+}
+
+
+.login-card h2 {
+  font-size: 21px;
+  margin-bottom: 6px;
+}
+
+
+.login-description {
+  color: #718096;
+  font-size: 12px;
+  margin-bottom: 22px;
+}
+
+
+.login-card label {
+  display: block;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  color: #344054;
+  margin-bottom: 7px;
+}
+
+
+/* ================= MOBILE INPUT ================= */
+
+.mobile-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dfe3ea;
+  border-radius: 13px;
+  background: white;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+
+.mobile-input span {
+  padding: 13px;
+  background: #f4f6ff;
+  color: #5367d9;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+
+.mobile-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 13px;
+  font-size: 13px;
+}
+
+
+.mobile-input:focus-within {
+  border-color: #5367d9;
+  box-shadow: 0 0 0 3px rgba(83, 103, 217, 0.1);
+}
+
+
+/* ================= LOGIN BUTTON ================= */
+
+.login-button {
+  width: 100%;
+  border: none;
+  border-radius: 13px;
+  padding: 14px;
+  background: #5367d9;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(83, 103, 217, 0.3);
+}
+
+
+.login-safety {
+  color: #98a2b3;
+  font-size: 10px;
+  margin-top: 17px;
+}
+
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+
+@keyframes rainMove {
+  0% {
+    transform: translateY(-15px);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: translateY(20px);
+    opacity: 1;
+  }
+}
+
+
+@keyframes waveMove {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(15px);
+  }
+}
+
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-6px);
+  }
+
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+
+@keyframes rocksMove {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+
+@keyframes loginAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+  .creative-login {
+    padding: 18px;
+  }
+
+  .disaster-scene {
+    width: 50%;
+    height: 38%;
+    padding: 18px;
+  }
+
+  .disaster-scene h2 {
+    font-size: 16px;
+  }
+
+  .disaster-scene p {
+    font-size: 9px;
+  }
+
+  .disaster-icon {
+    font-size: 38px;
+  }
+
+  .login-card {
+    max-width: 360px;
+    padding: 28px 22px;
+  }
+
+}
+/* ================================================= */
+/*        EXTRA PROFESSIONAL DISASTER ANIMATION      */
+/* ================================================= */
+
+/* All disaster panels */
+.disaster-scene {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Slight movement of the four panels */
+.rainfall {
+  animation: rainfallPanel 5s ease-in-out infinite;
+}
+
+.flood {
+  animation: floodPanel 6s ease-in-out infinite;
+}
+
+.earthquake {
+  animation: earthquakePanel 4s ease-in-out infinite;
+}
+
+.landslide {
+  animation: landslidePanel 6s ease-in-out infinite;
+}
+
+
+/* ================= RAIN EFFECT ================= */
+
+.rain-drops {
+  position: relative;
+  display: inline-block;
+  color: rgba(255,255,255,0.75);
+  text-shadow:
+    0 10px 0 rgba(255,255,255,0.35),
+    0 20px 0 rgba(255,255,255,0.25);
+  animation: heavyRain 1s linear infinite;
+}
+
+
+/* ================= WATER EFFECT ================= */
+
+.wave {
+  display: inline-block;
+  color: rgba(255,255,255,0.75);
+  text-shadow:
+    0 5px 0 rgba(255,255,255,0.15);
+  animation: waterWave 2s ease-in-out infinite;
+}
+
+
+/* ================= EARTHQUAKE EFFECT ================= */
+
+.earthquake .disaster-icon {
+  animation: earthquakeShake 1.2s infinite;
+}
+
+.shake-line {
+  display: inline-block;
+  animation: earthquakeLine 0.6s infinite;
+}
+
+
+/* ================= LANDSLIDE EFFECT ================= */
+
+.landslide .disaster-icon {
+  animation: mountainMove 4s ease-in-out infinite;
+}
+
+.rocks {
+  display: inline-block;
+  animation: fallingRocks 1.8s ease-in-out infinite;
+}
+
+
+/* ================= SOFT GLOW ================= */
+
+.disaster-icon {
+  filter: drop-shadow(0 8px 15px rgba(0,0,0,0.25));
+}
+
+
+/* ================= PANEL ANIMATIONS ================= */
+
+@keyframes rainfallPanel {
+
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-4px, 3px);
+  }
+
+}
+
+
+@keyframes floodPanel {
+
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(4px, -3px);
+  }
+
+}
+
+
+@keyframes earthquakePanel {
+
+  0%, 90%, 100% {
+    transform: translate(0, 0);
+  }
+
+  92% {
+    transform: translate(-3px, 2px);
+  }
+
+  94% {
+    transform: translate(3px, -2px);
+  }
+
+  96% {
+    transform: translate(-2px, 1px);
+  }
+
+}
+
+
+@keyframes landslidePanel {
+
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(3px, 3px);
+  }
+
+}
+
+
+/* ================= HEAVY RAIN ================= */
+
+@keyframes heavyRain {
+
+  0% {
+    transform: translateY(-15px);
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(18px);
+    opacity: 0.2;
+  }
+
+}
+
+
+/* ================= WATER WAVES ================= */
+
+@keyframes waterWave {
+
+  0% {
+    transform: translateX(-8px) scaleX(1);
+  }
+
+  50% {
+    transform: translateX(10px) scaleX(1.08);
+  }
+
+  100% {
+    transform: translateX(-8px) scaleX(1);
+  }
+
+}
+
+
+/* ================= EARTHQUAKE ================= */
+
+@keyframes earthquakeShake {
+
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  20% {
+    transform: translate(-4px, 2px) rotate(-2deg);
+  }
+
+  40% {
+    transform: translate(4px, -2px) rotate(2deg);
+  }
+
+  60% {
+    transform: translate(-3px, 1px) rotate(-1deg);
+  }
+
+  80% {
+    transform: translate(3px, -1px) rotate(1deg);
+  }
+
+}
+
+
+@keyframes earthquakeLine {
+
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-8px);
+  }
+
+  50% {
+    transform: translateX(8px);
+  }
+
+  75% {
+    transform: translateX(-5px);
+  }
+
+}
+
+
+/* ================= LANDSLIDE ================= */
+
+@keyframes mountainMove {
+
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+
+}
+
+
+@keyframes fallingRocks {
+
+  0% {
+    transform: translateY(-5px);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translateY(10px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-5px);
+    opacity: 0.5;
+  }
+
+}
+
+
+/* ================= LOGIN CARD EXTRA EFFECT ================= */
+
+.login-card {
+  animation:
+    loginAppear 0.8s ease,
+    cardFloat 5s ease-in-out 1s infinite;
+}
+
+
+/* Soft floating effect */
+@keyframes cardFloat {
+
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+}
+
+
+/* ================= LOGIN LOGO ================= */
+
+.login-logo {
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+
+@keyframes logoPulse {
+
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 10px 25px rgba(83, 103, 217, 0.3);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(83, 103, 217, 0.45);
+  }
+
+}
+
+
+/* ================= BUTTON EFFECT ================= */
+
+.login-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: rgba(255,255,255,0.18);
+  transform: skewX(-20deg);
+  animation: buttonShine 3.5s infinite;
+}
+
+
+@keyframes buttonShine {
+
+  0% {
+    left: -100%;
+  }
+
+  45%, 100% {
+    left: 130%;
+  }
+
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+  .disaster-scene {
+    opacity: 0.82;
+  }
+
+  .login-card {
+    animation:
+      loginAppear 0.8s ease,
+      cardFloat 5s ease-in-out 1s infinite;
+  }
+
+}
